@@ -2,4 +2,18 @@
     Layout = "~/Views/_Layout.cshtml";
 }
 
-<h1>Hello</h1>
+<div layout="column" layout-fill>
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <span>
+                Azimo test
+            </span>
+        </div>
+    </md-toolbar>
+
+</div>
+
+<div ng-controller="indexCtrl">
+    <button ng-click="logIn()">Login</button>
+    <p>{{userData}}</p>
+</div>
