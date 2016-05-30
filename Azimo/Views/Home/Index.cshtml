@@ -3,16 +3,16 @@
 }
 
 <div ng-controller="indexCtrl" layout="column" layout-fill>
-    <md-toolbar>
+    <md-toolbar ng-mouseleave="hideTooltip()">
         <div class="md-toolbar-tools">
             <span>Azimo test</span>
             <span flex></span>
             <div ng-hide="appState.loggedIn">
-                <md-button ng-click="logIn()" ng-mouseenter="showTooltip('SA')" ng-mouseleave="hideTooltip()" class="md-fab md-mini">SA</md-button>
-                <md-button ng-mouseenter="showTooltip('OA')" ng-mouseleave="hideTooltip()"class="md-fab md-mini">OA</md-button>
+                <md-button ng-click="logIn()" ng-mouseenter="showTooltip('BA')" class="md-fab md-mini">BA</md-button>
+                <md-button ng-mouseenter="showTooltip('OA')" class="md-fab md-mini">OA</md-button>
             </div>
             <div ng-show="appState.loggedIn">
-                <span>Welcome, {{userData.data.Login}}</span>
+                <span>Welcome, {{userData.login}}</span>
                 <md-button ng-click="logOut()" class="md-fab md-mini">LO</md-button>
             </div>
         </div>
@@ -20,13 +20,14 @@
     <md-subheader ng-show="tooltip.visible" style="border-bottom: 1px solid grey">
         {{tooltip.message}}
     </md-subheader>
-    <md-content>
-        <div ng-show="appState.loggedIn">
-            {{userData}}
+    <md-content layout layout-align="center center">
+        <div>
+            <basic-auth-drv login="logIn(userName, password)"></basic-auth-drv>
         </div>
-        <div ng-hide="appState.loggedIn" layout layout-align="center center">
-                <h1>Please log in to see stuff...</h1>
+        <div ng-hide="appState.loggedIn">
+            <div ng-show="appState.loggedIn">
+                {{userData}}
+            </div>
         </div>
-
     </md-content>
 </div>
