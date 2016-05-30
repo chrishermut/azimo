@@ -2,18 +2,31 @@
     Layout = "~/Views/_Layout.cshtml";
 }
 
-<div layout="column" layout-fill>
+<div ng-controller="indexCtrl" layout="column" layout-fill>
     <md-toolbar>
         <div class="md-toolbar-tools">
-            <span>
-                Azimo test
-            </span>
+            <span>Azimo test</span>
+            <span flex></span>
+            <div ng-hide="appState.loggedIn">
+                <md-button ng-click="logIn()" ng-mouseenter="showTooltip('SA')" ng-mouseleave="hideTooltip()" class="md-fab md-mini">SA</md-button>
+                <md-button ng-mouseenter="showTooltip('OA')" ng-mouseleave="hideTooltip()"class="md-fab md-mini">OA</md-button>
+            </div>
+            <div ng-show="appState.loggedIn">
+                <span>Welcome, {{userData.data.Login}}</span>
+                <md-button ng-click="logOut()" class="md-fab md-mini">LO</md-button>
+            </div>
         </div>
     </md-toolbar>
+    <md-subheader ng-show="tooltip.visible" style="border-bottom: 1px solid grey">
+        {{tooltip.message}}
+    </md-subheader>
+    <md-content>
+        <div ng-show="appState.loggedIn">
+            {{userData}}
+        </div>
+        <div ng-hide="appState.loggedIn" layout layout-align="center center">
+                <h1>Please log in to see stuff...</h1>
+        </div>
 
-</div>
-
-<div ng-controller="indexCtrl">
-    <button ng-click="logIn()">Login</button>
-    <p>{{userData}}</p>
+    </md-content>
 </div>
