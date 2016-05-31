@@ -3,6 +3,16 @@
         $mdThemingProvider.theme('altTheme')
           .primaryPalette('purple')
     })
+    .service('languageSrvc', function () {
+        return {
+            polish: {
+                salutation: 'Witaj'
+            },
+            english: {
+                salutation: 'Welcome'
+            }
+        }
+    })
     .service('appStateSrvc', function () {
         return {
             loggedIn: false
@@ -24,13 +34,26 @@
             }
         }
     })
-    .controller('indexCtrl', function ($scope, $timeout, appStateSrvc, helpersSrvc) {
+    .controller('indexCtrl', function ($scope, $timeout, appStateSrvc, languageSrvc, helpersSrvc) {
         // Initial
-        $scope.userData = {};
+        $scope.userData = null;
         $scope.tooltip = {
             visible: false,
             message: ''
         };
+        $scope.showLoginForm = false;
+
+        // Language related
+        $scope.language = {
+            current: 'pl',
+            content: languageSrvc.polish
+        };
+
+        $scope.changeLanguage = function () {
+            $scope.language.current = $scope.language.current == 'pl' ? 'en' : 'pl';
+            $scope.language.content = $scope.language.current == 'pl' ? languageSrvc.polish : languageSrvc.english;
+        }
+
 
         $scope.appState = appStateSrvc;
 
@@ -41,7 +64,7 @@
                       $scope.userData = result.data.data;
                       appStateSrvc.loggedIn = true;
                   } else if (result.data.status == 'Error') {
-                      $scope.userData = {};
+                      $scope.userData = null;
                       appStateSrvc.loggedIn = false;
 
                       // Lazy message for now
@@ -97,10 +120,12 @@
 
                 scope.goMental = function () {
                     scope.login({ userName: scope.user.name, password: scope.user.password })
+                    scope.showLoginForm = false;
                 }
             },
             scope: {
-                login: '&'
+                login: '&',
+                showLoginForm: '='
             }
         }
     })

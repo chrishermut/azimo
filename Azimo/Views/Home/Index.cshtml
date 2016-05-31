@@ -8,12 +8,16 @@
             <span>Azimo test</span>
             <span flex></span>
             <div ng-hide="appState.loggedIn">
-                <md-button ng-click="logIn()" ng-mouseenter="showTooltip('BA')" class="md-fab md-mini">BA</md-button>
+                <md-button ng-click="showLoginForm = true" ng-mouseenter="showTooltip('BA')" class="md-fab md-mini">BA</md-button>
                 <md-button ng-mouseenter="showTooltip('OA')" class="md-fab md-mini">OA</md-button>
             </div>
             <div ng-show="appState.loggedIn">
-                <span>Welcome, {{userData.login}}</span>
+                <span>{{language.content.salutation}}, {{userData.login}}</span>
                 <md-button ng-click="logOut()" class="md-fab md-mini">LO</md-button>
+            </div>
+            <span>|</span>
+            <div>
+                <md-button ng-click="changeLanguage()" class="md-fab md-mini">{{language.current}}</md-button>
             </div>
         </div>
     </md-toolbar>
@@ -21,13 +25,11 @@
         {{tooltip.message}}
     </md-subheader>
     <md-content layout layout-align="center center">
-        <div>
-            <basic-auth-drv login="logIn(userName, password)"></basic-auth-drv>
+        <div ng-show="showLoginForm">
+            <basic-auth-drv login="logIn(userName, password)" show-login-form="showLoginForm"></basic-auth-drv>
         </div>
-        <div ng-hide="appState.loggedIn">
-            <div ng-show="appState.loggedIn">
-                {{userData}}
-            </div>
+        <div ng-show="appState.loggedIn">
+            <a href="Home/ListRepos">click</a>
         </div>
     </md-content>
 </div>
