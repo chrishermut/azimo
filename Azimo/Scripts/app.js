@@ -1,4 +1,4 @@
-﻿angular.module('app', ['ngMaterial', 'ngMessages'])
+﻿angular.module('app', ['ngMaterial', 'ngMessages', 'md.data.table'])
     .config(function ($mdThemingProvider) {
         $mdThemingProvider.theme('altTheme')
           .primaryPalette('purple')
@@ -167,18 +167,21 @@
             templateUrl: 'Home/Panel',
             link: function (scope, iElement, attrs) {
                 // Initial
-                scope.user = {
+                scope.getUserFormData = {
                     name: 'chrishermut'
                 };
 
+                scope.data = null;
+
                 scope.getUserData = function () {
-                    helpersSrvc.getUserData(scope.user.name)
+                    helpersSrvc.getUserData(scope.getUserFormData.name)
                         .then(function (result) {
-                            alert(result.data)
+                            scope.data = result.data;
                         }, function () {
 
                         })
                 }
-            }
+            },
+            scope: {}
         }
     })

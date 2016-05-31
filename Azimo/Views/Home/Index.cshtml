@@ -24,14 +24,14 @@
     @*<md-subheader ng-show="tooltip.visible" style="border-bottom: 1px solid grey">
         {{tooltip.message}}
     </md-subheader>*@
-    <md-content layout layout-align="center center" style="height: 80vh">
+    <md-content layout layout-align="center center" style="min-height: 80vh">
         <h1 ng-hide="showLoginForm || appState.loggedIn">
             {{language.content.notLoggedInMsg[language.current]}}
         </h1>
         <div ng-show="showLoginForm" md-whiteframe="3dp" layout-padding flex="50">
             <basic-auth-drv login="logIn(userName, password)" show-login-form="showLoginForm"></basic-auth-drv>
         </div>
-        <div ng-show="appState.loggedIn" md-whiteframe="3dp" layout-padding flex="50">
+        <div ng-show="appState.loggedIn" md-whiteframe="3dp" layout-padding flex="90">
             <panel-drv></panel-drv>
         </div>
     </md-content>

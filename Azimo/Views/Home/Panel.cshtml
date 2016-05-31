@@ -1,7 +1,7 @@
-﻿<ng-form novalidate name="searchUserForm" layout="column" layout-padding>
-    <md-input-container>
+﻿<ng-form novalidate name="getUserForm" layout="column" layout-padding>
+    <md-input-container style="margin: 0 0 0 0 ">
         <label>Username</label>
-        <input type="text" ng-model="user.name" name="name" required="">
+        <input type="text" ng-model="getUserFormData.name" name="name" required="">
     </md-input-container>
     <div layout>
         <span flex></span>
@@ -10,3 +10,35 @@
         </md-button>
     </div>
 </ng-form>
+<md-divider></md-divider>
+<div ng-hide="data == null">
+    <md-data-table-toolbar style="border-bottom: solid whitesmoke 1px; background-color: skyblue">
+        <div class="md-toolbar-tools">
+            <span>{{data.userData.username}}'s repositories</span>
+        </div>
+    </md-data-table-toolbar>
+    <md-data-table-container style="max-height: 50vh">
+        <table md-data-table md-row-select="selected">
+            <thead>
+                <tr>
+                    <th name="Name"></th>
+                    <th name="Created"></th>
+                    <th name="Updated"></th>
+                    <th name="Language"></th>
+                    <th name="Stars"></th>
+                    <th name="Forks"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr md-auto-select ng-repeat="repo in data.repositories track by $index">
+                    <td>{{repo.name}}</td>
+                    <td>{{repo.createdAt}}</td>
+                    <td>{{repo.updatedAt}}</td>
+                    <td>{{repo.language}}</td>
+                    <td>{{repo.stars}}</td>
+                    <td>{{repo.forks}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </md-data-table-container>
+</div>

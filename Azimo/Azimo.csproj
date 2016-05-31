@@ -104,6 +104,8 @@
     <Content Include="Scripts\angular-messages.min.js" />
     <Content Include="Scripts\angular.min.js" />
     <Content Include="Scripts\app.js" />
+    <Content Include="Scripts\md-data-table.js" />
+    <Content Include="Styles\md-data-table.css" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -131,7 +133,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
     <Folder Include="Views\Github\" />
   </ItemGroup>
   <PropertyGroup>
