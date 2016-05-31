@@ -1,0 +1,12 @@
+﻿<ng-form novalidate name="searchUserForm" layout="column" layout-padding>
+    <md-input-container>
+        <label>Username</label>
+        <input type="text" ng-model="user.name" name="name" required="">
+    </md-input-container>
+    <div layout>
+        <span flex></span>
+        <md-button ng-click="getUserData()" class="md-button md-raised" aria-label="...">
+            Get user data
+        </md-button>
+    </div>
+</ng-form>

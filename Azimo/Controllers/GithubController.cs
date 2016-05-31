@@ -48,7 +48,7 @@ namespace Azimo.Controllers
 
         public async Task<string> GetUserData(string username)
         {
-            return "Ok";
+            return username;
         }
 
         //public async Task<string> ListRepos(string username)

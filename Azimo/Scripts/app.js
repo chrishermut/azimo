@@ -166,10 +166,15 @@
             restrict: 'E',
             templateUrl: 'Home/Panel',
             link: function (scope, iElement, attrs) {
+                // Initial
+                scope.user = {
+                    name: 'chrishermut'
+                };
+
                 scope.getUserData = function () {
-                    helpersSrvc.getUserData()
-                        .then(function () {
-                            alert('Ok')
+                    helpersSrvc.getUserData(scope.user.name)
+                        .then(function (result) {
+                            alert(result.data)
                         }, function () {
 
                         })
