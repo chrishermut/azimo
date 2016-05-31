@@ -1,14 +1,14 @@
-﻿<h1>In case you want to go mental...</h1>
+﻿<h1>{{language.content.basicAuthForm.title[language.current]}}</h1>
 <ng-form novalidate name="basicAuthForm" layout="column" layout-padding>
     <md-input-container>
-        <label>Username</label>
+        <label>{{language.content.basicAuthForm.username[language.current]}}</label>
         <input type="text" ng-model="user.name" name="name" required="">
         <div ng-messages="basicAuthForm.name.$error">
             <div ng-message="required">Field is required</div>
         </div>
     </md-input-container>
     <md-input-container>
-        <label>Password</label>
+        <label>{{language.content.basicAuthForm.password[language.current]}}</label>
         <input type="password" ng-model="user.password" name="password" required="">
         <div ng-messages="basicAuthForm.password.$error">
             <div ng-message="required">Field is required</div>
@@ -17,7 +17,7 @@
     <div layout>
         <span flex></span>
         <md-button ng-click="goMental()" ng-disabled="basicAuthForm.$invalid" class="md-button md-raised" aria-label="...">
-            Login (Hi, spoofers)
+            {{language.content.basicAuthForm.loginButton[language.current]}}
         </md-button>
     </div>
 </ng-form>
