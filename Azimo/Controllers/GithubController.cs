@@ -126,8 +126,29 @@ namespace Azimo.Controllers
             {
                 return "Server error";
             }
+        }
 
-            return "Ok";
+        public async Task<string> UnstarRepo(string username, string name)
+        {
+            client.Credentials = currentCredentials;
+
+            try
+            {
+                bool starred = await client.Activity.Starring.CheckStarred(username, name);
+
+                if (!starred)
+                {
+                    return "Repo not starred";
+                }
+
+                bool result = await client.Activity.Starring.RemoveStarFromRepo(username, name);
+
+                return result == true ? "Ok" : "Unable to unstar repo";
+            }
+            catch (Exception ex)
+            {
+                return "Server error";
+            }
         }
     }
 }

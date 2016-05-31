@@ -26,5 +26,10 @@ namespace Azimo.Controllers
         {
             return View();
         }
+
+        public ActionResult UnstarRepoDialog()
+        {
+            return View();
+        }
     }
 }

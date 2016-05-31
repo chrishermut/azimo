@@ -99,6 +99,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
+    <Content Include="Icons\ic_sentiment_dissatisfied_black_24px.svg" />
     <Content Include="Icons\ic_sentiment_satisfied_black_24px.svg" />
     <Content Include="Scripts\angular-animate.min.js" />
     <Content Include="Scripts\angular-aria.min.js" />
@@ -125,6 +126,7 @@
     <Content Include="Views\_Layout.cshtml" />
     <Content Include="Views\Home\BasicAuthForm.cshtml" />
     <Content Include="Views\Home\Panel.cshtml" />
+    <Content Include="Views\Home\UnstarRepoDialog.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -14,6 +14,12 @@
                     username: { pl: 'Nazwa użytkownika', en: 'Username' },
                     password: { pl: 'Hasło', en: 'Password' },
                     loginButton: { pl: 'Zaloguj mnie (Hej, spoofersi)', en: 'Login (Hi, spoofers)' }
+                },
+                unstarDialog: {
+                    confirmTitle: { pl: 'Proszę potwierdź', en: 'Please confirm' },
+                    confirmContent: { pl: 'Czy napewno chcesz pozbawić to repo swojej gwiazdki?', en: 'Are you sure that you want to unstar this repo?' },
+                    confirmOk: { pl: 'Tak, proszę', en: 'Yes, please' },
+                    confirmCancel: { pl: 'Nie, przepraszam', en: 'No, sorry'}
                 }
             }
         }
@@ -55,6 +61,21 @@
                 $http({
                     method: 'GET',
                     url: 'Github/StarRepo?username=' + username + '&name=' + repo,
+                })
+                .then(function (result) {
+                    q.resolve(result);
+                }, function (result) {
+                    q.resolve(result);
+                })
+
+                return q.promise
+            },
+            unstarRepo: function (username, repo) {
+                var q = $q.defer();
+
+                $http({
+                    method: 'GET',
+                    url: 'Github/UnstarRepo?username=' + username + '&name=' + repo,
                 })
                 .then(function (result) {
                     q.resolve(result);
@@ -176,7 +197,7 @@
             }
         }
     })
-    .directive('panelDrv', function (helpersSrvc) {
+    .directive('panelDrv', function (helpersSrvc, languageSrvc, $mdDialog) {
         return {
             restrict: 'E',
             templateUrl: 'Home/Panel',
@@ -230,6 +251,41 @@
                         }, function (result) {
                             console.log(result)
                         })
+                };
+
+                function unstarRepo() {
+                    helpersSrvc.unstarRepo(scope.data.userData.login, scope.selected[0].name)
+                        .then(function (result) {
+                            alert(result.data)
+                        }, function (result) {
+
+                        })
+                };
+
+                // Dialogs
+                scope.unstarRepoDialog = function () {
+                    if (scope.selected.length == 1) {
+                        var confirm = $mdDialog.confirm({
+                            title: languageSrvc.content.unstarDialog.confirmTitle[languageSrvc.current],
+                            content: languageSrvc.content.unstarDialog.confirmContent[languageSrvc.current],
+                            ok: languageSrvc.content.unstarDialog.confirmOk[languageSrvc.current],
+                            cancel: languageSrvc.content.unstarDialog.confirmCancel[languageSrvc.current]
+                        });
+
+                        $mdDialog.show(confirm).then(function () {
+                            unstarRepo();
+                        }, function () {
+
+                        });
+                    } else {
+                        var alert = $mdDialog.alert({
+                            title: 'Attention',
+                            content: 'Select single repo to unstar!',
+                            ok: 'Ok'
+                        });
+
+                        $mdDialog.show(alert).finally(function () { $mdDialog.hide() });
+                    }
                 };
             },
             scope: {}

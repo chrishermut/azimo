@@ -20,6 +20,9 @@
         <md-button ng-click="starRepo()" ng-disabled="selected.length == 0" class="md-icon-button">
             <md-icon md-svg-icon="../icons/ic_sentiment_satisfied_black_24px.svg"></md-icon>
         </md-button>
+        <md-button ng-click="unstarRepoDialog()" ng-disabled="selected.length == 0" class="md-icon-button">
+            <md-icon md-svg-icon="../icons/ic_sentiment_dissatisfied_black_24px.svg"></md-icon>
+        </md-button>
     </md-data-table-toolbar>
     <md-data-table-container style="max-height: 50vh">
         <table md-data-table md-row-select="selected">
