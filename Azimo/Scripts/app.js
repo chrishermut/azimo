@@ -48,10 +48,25 @@
                 })
 
                 return q.promise
+            },
+            starRepo: function (username, repo) {
+                var q = $q.defer();
+
+                $http({
+                    method: 'GET',
+                    url: 'Github/StarRepo?username=' + username + '&name=' + repo,
+                })
+                .then(function (result) {
+                    q.resolve(result);
+                }, function (result) {
+                    q.resolve(result);
+                })
+
+                return q.promise
             }
         }
     })
-    .controller('indexCtrl', function ($scope, $rootScope, $timeout, appStateSrvc, languageSrvc, helpersSrvc) {
+    .controller('indexCtrl', function ($scope, $rootScope, $timeout, $location, appStateSrvc, languageSrvc, helpersSrvc) {
         // Initial
         $scope.userData = null;
         $scope.tooltip = {
@@ -171,16 +186,51 @@
                     name: 'chrishermut'
                 };
 
+                scope.selected = [];
+
                 scope.data = null;
 
                 scope.getUserData = function () {
                     helpersSrvc.getUserData(scope.getUserFormData.name)
                         .then(function (result) {
-                            scope.data = result.data;
+                            if (result.data.message == 'User error') {
+                                alert('User error');
+
+                                scope.data = null;
+                            } else if (result.data.message == 'Repository search error') {
+                                alert('Repository search error');
+
+                                scope.data = null;
+                            } else if (result.data.message == 'Ok') {
+                                scope.data = result.data;
+                            }
                         }, function () {
 
                         })
-                }
+                };
+
+                scope.starRepo = function () {
+                    helpersSrvc.starRepo(scope.data.userData.login, scope.selected[0].name)
+                        .then(function (result) {
+                            if (result.data == 'Ok') {
+                                // Update data
+                                for (var x = 0; x < scope.data.repositories.length; x++) {
+                                    if (scope.data.repositories[x].name == scope.selected[0].name) {
+                                        scope.data.repositories[x].stars++;
+                                        break;
+                                    }
+                                }
+
+                                scope.selected = [];
+                            } else if (result.data == 'Unable to star repo') {
+                                alert(result.data)
+                            } else if (result.data == 'Repo already starred') {
+                                alert(result.data)
+                            }
+                        }, function (result) {
+                            console.log(result)
+                        })
+                };
             },
             scope: {}
         }

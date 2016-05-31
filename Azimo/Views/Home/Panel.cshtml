@@ -11,11 +11,15 @@
     </div>
 </ng-form>
 <md-divider></md-divider>
-<div ng-hide="data == null">
+<div ng-hide="data == null || data.repositories.length == 0">
     <md-data-table-toolbar style="border-bottom: solid whitesmoke 1px; background-color: skyblue">
         <div class="md-toolbar-tools">
             <span>{{data.userData.username}}'s repositories</span>
         </div>
+        <span flex></span>
+        <md-button ng-click="starRepo()" ng-disabled="selected.length == 0" class="md-icon-button">
+            <md-icon md-svg-icon="../icons/ic_sentiment_satisfied_black_24px.svg"></md-icon>
+        </md-button>
     </md-data-table-toolbar>
     <md-data-table-container style="max-height: 50vh">
         <table md-data-table md-row-select="selected">

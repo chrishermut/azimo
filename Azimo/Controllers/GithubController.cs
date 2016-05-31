@@ -10,13 +10,14 @@ namespace Azimo.Controllers
     public class GithubController : Controller
     {
         readonly GitHubClient client = new GitHubClient(new ProductHeaderValue("Azimo"));
+        private static Credentials currentCredentials;
 
         public async Task<string> Login(string username, string password)
         {
             try
             {
-                var basicAuth = new Credentials(username, password);
-                client.Credentials = basicAuth;
+                currentCredentials = new Credentials(username, password);
+                client.Credentials = currentCredentials;
 
                 User user = await client.User.Current();
 
@@ -47,9 +48,32 @@ namespace Azimo.Controllers
 
         public async Task<string> GetUserData(string username)
         {
-            var request = new SearchRepositoriesRequest() { User = username };
+            User user = null;
+            SearchRepositoryResult result = null;
+            client.Credentials = currentCredentials;
 
-            var result = await client.Search.SearchRepo(request);
+            try
+            {
+                user = await client.User.Get(username);
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new JObject(
+                new JProperty("message", "User error")
+                ));
+            }
+
+            try
+            {
+                var customRequest = new SearchRepositoriesRequest() { User = username };
+                result = await client.Search.SearchRepo(customRequest);
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new JObject(
+                new JProperty("message", "Repository search error")
+                ));
+            }
 
             JArray repositoriesArray = new JArray();
 
@@ -67,8 +91,6 @@ namespace Azimo.Controllers
                 );
             }
 
-            User user = await client.User.Get(username);
-
             JObject userData = new JObject(
                 new JProperty("login", user.Login),
                 new JProperty("username", user.Name),
@@ -77,9 +99,35 @@ namespace Azimo.Controllers
             );
 
             return JsonConvert.SerializeObject(new JObject(
+                new JProperty("message", "Ok"),
                 new JProperty("userData", userData),
                 new JProperty("repositories", repositoriesArray)
             ));
+        }
+
+        public async Task<string> StarRepo(string username, string name)
+        {
+            client.Credentials = currentCredentials;
+
+            try
+            {
+                bool starred = await client.Activity.Starring.CheckStarred(username, name);
+
+                if (starred)
+                {
+                    return "Repo already starred";
+                }
+
+                bool result = await client.Activity.Starring.StarRepo(username, name);
+
+                return result == true ? "Ok" : "Unable to star repo";
+            }
+            catch (Exception ex)
+            {
+                return "Server error";
+            }
+
+            return "Ok";
         }
     }
 }
