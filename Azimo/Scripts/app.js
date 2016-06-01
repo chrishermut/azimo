@@ -17,24 +17,49 @@
                 panelSearch: {
                     label: { pl: 'Użytkownik', en: 'Username' },
                     placeholder: { pl: 'Wprowadź wartość', en: 'Provide a value' },
-                    button: { pl: 'Szukaj', en: 'Search'}
+                    button: { pl: 'Szukaj', en: 'Search' }
                 },
                 panelTable: {
                     title: { pl: 'repozytoria', en: 'repositories' },
                     headers: {
-                        name: { pl: 'Nazwa', en: 'Name'},
+                        name: { pl: 'Nazwa', en: 'Name' },
                         created: { pl: 'Utworzone', en: 'Created' },
                         updated: { pl: 'Uaktualnione', en: 'Updated' },
                         language: { pl: 'Język', en: 'Language' },
                         stars: { pl: 'Gwiazdki', en: 'Stars' },
-                        forks: { pl: 'Widelce...', en: 'Forks'}
+                        forks: { pl: 'Widelce...', en: 'Forks' }
                     }
                 },
                 unstarDialog: {
                     confirmTitle: { pl: 'Proszę potwierdź', en: 'Please confirm' },
                     confirmContent: { pl: 'Czy napewno chcesz pozbawić to repo swojej gwiazdki?', en: 'Are you sure that you want to unstar this repo?' },
                     confirmOk: { pl: 'Tak, proszę', en: 'Yes, please' },
-                    confirmCancel: { pl: 'Nie, przepraszam', en: 'No, sorry'}
+                    confirmCancel: { pl: 'Nie, przepraszam', en: 'No, sorry' }
+                },
+                starDialog: {
+                    confirmTitle: { pl: 'Proszę potwierdź', en: 'Please confirm' },
+                    confirmContent: { pl: 'Czy napewno chcesz dodać gwiazdkę?', en: 'Are you sure that you want to star this repo?' },
+                    confirmOk: { pl: 'Tak, proszę', en: 'Yes, please' },
+                    confirmCancel: { pl: 'Nie, przepraszam', en: 'No, sorry' }
+                },
+                toasts: {
+                    searchUserError: { pl: 'Nie mogę znaleźć użytkownika', en: 'Unable to find user' },
+                    noUserRepos: { pl: 'Użytkownik nie posiada repozytoriów', en: 'User does not have any repos' },
+                    starRepoThanks: { pl: 'Dzięki za pogwiazdkowanie', en: 'Thanks for staring this repo' },
+                    unableToStarRepo: { pl: 'Nie można pogwiazdkować repo', en: 'Unable to star repot'},
+                    unstarRepoThanks: { pl: 'Dzięki mimo wszystko', en: 'Sorry that you unstared' },
+                    unableToUnstarRepo: { pl: 'Nie można odpogwiazdkować repo', en: 'Unable to unstar repot' },
+                    repoNotStaredYet: { pl: 'Jeszcze nie dodałeś swojej gwiazdki', en: 'You did not star this repo yet'},
+                    repoAlreadyStared: { pl: 'Repo jest już pogwiazdkowane', en: 'You already starred this repo' },
+                    generic: {
+                        serverError: { pl: 'Błąd serwera', en: 'Server error' },
+                        unknownServerResponse: { pl: 'Nieznana odpowiedź serwera', en: 'Unknown server response'},
+                        badCredentials: { pl: 'Niepoprawne dane', en: 'Bad credentials'}
+                    }
+                },
+                tooltips: {
+                    logout: { pl: 'Wyloguj', en: 'Logout' },
+                    changeLanguage: { pl: 'Zmień język', en: 'Change language' }
                 }
             }
         }
@@ -57,6 +82,9 @@
                 })
 
                 return q.promise
+            },
+            logOut: function () {
+                $http({ method: 'GET', url: 'Home/Logout' })
             },
             getUserData: function (userName) {
                 var q = $q.defer();
@@ -102,7 +130,7 @@
             }
         }
     })
-    .controller('indexCtrl', function ($scope, $rootScope, $timeout, $location, $element, appStateSrvc, languageSrvc, helpersSrvc) {
+    .controller('indexCtrl', function ($scope, $rootScope, $timeout, $location, $element, $mdToast, appStateSrvc, languageSrvc, helpersSrvc) {
         // Naive check to see if user is logged in
         (function () {
             var username = angular.element(document).find('my-data').attr('username');
@@ -138,17 +166,19 @@
                   } else if (result.data.status == 'Error') {
                       appStateSrvc.githubUsername = '';
 
-                      // Lazy message for now
-                      alert('Bad credentials')
+                      $mdToast.show($mdToast.simple().textContent(scope.language.content.toasts.generic.badCredentials[scope.language.current]));
                   } else {
-                      alert('Unknown server response')
+                      $mdToast.show($mdToast.simple().textContent(scope.language.content.toasts.generic.unknownServerResponse[scope.language.current]));
                   }
               }, function (result) {
-
+                  $mdToast.show($mdToast.simple().textContent(scope.language.content.toasts.generic.badCredentials[scope.language.current]));
               })
         };
 
         $scope.logOut = function () {
+            helpersSrvc.logOut();
+
+            $rootScope.$broadcast('logout');
             appStateSrvc.githubUsername = '';
         };
 
@@ -169,8 +199,8 @@
                 };
 
                 scope.user = {
-                    name: 'chris.hermut@gmail.com',
-                    password: 'werty1234'
+                    name: '',
+                    password: ''
                 };
 
                 scope.goMental = function () {
@@ -180,20 +210,25 @@
                 scope.$on('languageChange', function (event, args) {
                     scope.language.current = args.current;
                 })
+
+                scope.$on('logout', function () {
+                    scope.user.name = '';
+                    scope.user.password = '';
+                })
             },
             scope: {
                 login: '&',
             }
         }
     })
-    .directive('panelDrv', function (helpersSrvc, languageSrvc, $mdDialog) {
+    .directive('panelDrv', function (helpersSrvc, languageSrvc, $mdDialog, $mdToast) {
         return {
             restrict: 'E',
             templateUrl: 'Home/Panel',
             link: function (scope, iElement, attrs) {
                 // Initial
                 scope.getUserFormData = {
-                    name: 'chrishermut'
+                    name: ''
                 };
 
                 // Language related
@@ -206,6 +241,11 @@
                     scope.language.current = args.current;
                 })
 
+                scope.$on('logout', function () {
+                    scope.data = null;
+                    scope.getUserFormData.name = '';
+                })
+
                 scope.selected = [];
 
                 scope.data = null;
@@ -214,11 +254,11 @@
                     helpersSrvc.getUserData(scope.getUserFormData.name)
                         .then(function (result) {
                             if (result.data.message == 'User error') {
-                                alert('User error');
+                                $mdToast.show($mdToast.simple().textContent(scope.language.content.toasts.searchUserError[scope.language.current]));
 
                                 scope.data = null;
                             } else if (result.data.message == 'Repository search error') {
-                                alert('Repository search error');
+                                $mdToast.show($mdToast.simple().textContent(scope.language.content.toasts.noUserRepos[scope.language.current]));
 
                                 scope.data = null;
                             } else if (result.data.message == 'Ok') {
@@ -241,23 +281,44 @@
                                     }
                                 }
 
-                                scope.selected = [];
+                                $mdToast.show($mdToast.simple().textContent(scope.language.content.toasts.starRepoThanks[scope.language.current]));
                             } else if (result.data == 'Unable to star repo') {
-                                alert(result.data)
+                                $mdToast.show($mdToast.simple().textContent(scope.language.content.toasts.unableToStarRepo[scope.language.current]));
                             } else if (result.data == 'Repo already starred') {
-                                alert(result.data)
+                                $mdToast.show($mdToast.simple().textContent(scope.language.content.toasts.repoAlreadyStared[scope.language.current]));
+                            } else {
+                                $mdToast.show($mdToast.simple().textContent(scope.language.content.toasts.generic.unknownServerResponse[scope.language.current]));
                             }
+
+                            scope.selected = [];
                         }, function (result) {
-                            console.log(result)
+                            $mdToast.show($mdToast.simple().textContent(scope.language.content.toasts.generic.serverError[scope.language.current]));
                         })
                 }
 
                 function unstarRepo() {
                     helpersSrvc.unstarRepo(scope.data.userData.login, scope.selected[0].name)
                         .then(function (result) {
-                            alert(result.data)
-                        }, function (result) {
+                            if (result.data == 'Ok') {
+                                // Update data
+                                for (var x = 0; x < scope.data.repositories.length; x++) {
+                                    if (scope.data.repositories[x].name == scope.selected[0].name) {
+                                        scope.data.repositories[x].stars--;
+                                        break;
+                                    }
+                                }
 
+                                $mdToast.show($mdToast.simple().textContent(scope.language.content.toasts.unstarRepoThanks[scope.language.current]));
+                            } else if (result.data == 'Repo not starred') {
+                                $mdToast.show($mdToast.simple().textContent(scope.language.content.toasts.repoNotStaredYet[scope.language.current]));
+                            } else if (result.data == 'Unable to unstar repo') {
+                                $mdToast.show($mdToast.simple().textContent(scope.language.content.toasts.unableToUnstarRepo[scope.language.current]));
+                            } else {
+                                $mdToast.show($mdToast.simple().textContent(scope.language.content.toasts.generic.unknownServerResponse[scope.language.current]));
+                            }
+                            scope.selected = [];
+                        }, function (result) {
+                            $mdToast.show($mdToast.simple().textContent(scope.language.content.toasts.generic.serverError[scope.language.current]));
                         })
                 }
 
@@ -273,6 +334,31 @@
 
                         $mdDialog.show(confirm).then(function () {
                             unstarRepo();
+                        }, function () {
+
+                        });
+                    } else {
+                        var alert = $mdDialog.alert({
+                            title: 'Attention',
+                            content: 'Select single repo to unstar!',
+                            ok: 'Ok'
+                        });
+
+                        $mdDialog.show(alert).finally(function () { $mdDialog.hide() });
+                    }
+                };
+
+                scope.starRepoDialog = function () {
+                    if (scope.selected.length == 1) {
+                        var confirm = $mdDialog.confirm({
+                            title: languageSrvc.content.starDialog.confirmTitle[languageSrvc.current],
+                            content: languageSrvc.content.starDialog.confirmContent[languageSrvc.current],
+                            ok: languageSrvc.content.starDialog.confirmOk[languageSrvc.current],
+                            cancel: languageSrvc.content.starDialog.confirmCancel[languageSrvc.current]
+                        });
+
+                        $mdDialog.show(confirm).then(function () {
+                            starRepo();
                         }, function () {
 
                         });

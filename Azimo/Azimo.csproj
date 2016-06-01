@@ -112,7 +112,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\RouteConfig.cs" />
-    <Compile Include="Controllers\GithubController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -126,7 +125,7 @@
     <Content Include="Views\_Layout.cshtml" />
     <Content Include="Views\Home\BasicAuthForm.cshtml" />
     <Content Include="Views\Home\Panel.cshtml" />
-    <Content Include="Views\Home\UnstarRepoDialog.cshtml" />
+    <None Include="Properties\PublishProfiles\azimotest.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -136,7 +135,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Github\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

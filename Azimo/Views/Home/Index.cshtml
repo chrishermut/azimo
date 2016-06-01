@@ -11,11 +11,21 @@
             <span flex></span>
             <div ng-show="appState.githubUsername != ''">
                 <span>{{language.content.salutation[language.current]}}, {{appState.githubUsername}}</span>
-                <md-button ng-click="logOut()" class="md-fab md-mini">LO</md-button>
+                <md-button ng-click="logOut()" class="md-fab md-mini">
+                    <md-tooltip>
+                        {{language.content.tooltips.logout[language.current]}}
+                    </md-tooltip>
+                    LO
+                </md-button>
             </div>
             <span>|</span>
             <div>
-                <md-button ng-click="changeLanguage()" class="md-fab md-mini">{{language.current}}</md-button>
+                <md-button ng-click="changeLanguage()" class="md-fab md-mini">
+                    <md-tooltip>
+                        {{language.content.tooltips.changeLanguage[language.current]}}
+                    </md-tooltip>
+                    {{language.current}}
+                </md-button>
             </div>
         </div>
     </md-toolbar>

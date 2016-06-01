@@ -20,7 +20,7 @@
             <span>{{data.userData.username}} - {{language.content.panelTable.title[language.current]}}</span>
         </div>
         <span flex></span>
-        <md-button ng-click="starRepo()" ng-disabled="selected.length == 0" class="md-icon-button">
+        <md-button ng-click="starRepoDialog()" ng-disabled="selected.length == 0" class="md-icon-button">
             <md-icon md-svg-icon="../icons/ic_sentiment_satisfied_black_24px.svg"></md-icon>
         </md-button>
         <md-button ng-click="unstarRepoDialog()" ng-disabled="selected.length == 0" class="md-icon-button">
