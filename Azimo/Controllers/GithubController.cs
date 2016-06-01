@@ -4,6 +4,8 @@ using Octokit;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Web;
+using System.Collections.Generic;
 
 namespace Azimo.Controllers
 {
@@ -32,6 +34,9 @@ namespace Azimo.Controllers
                     new JProperty("status", "Ok"),
                     new JProperty("data", returndUserDate)
                 );
+
+                // Set cookie
+                SetCookie(username, password);
 
                 return JsonConvert.SerializeObject(output);
             }
@@ -149,6 +154,20 @@ namespace Azimo.Controllers
             {
                 return "Server error";
             }
+        }
+
+        public bool SetCookie(string username, string password)
+        {
+            HttpCookie cookie = new HttpCookie("AzimoTestCookie");
+
+            cookie.Value = JsonConvert.SerializeObject(new JObject(new JProperty("username", username), new JProperty("password", password)));
+
+            cookie.Expires = DateTime.Now.AddHours(1);
+
+            // Add the cookie.
+            Response.Cookies.Add(cookie);
+
+            return true;
         }
     }
 }

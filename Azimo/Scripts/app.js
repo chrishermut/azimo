@@ -9,11 +9,26 @@
             content: {
                 title: { pl: 'Testowa aplikacja', en: 'Test application' },
                 salutation: { pl: 'Witaj', en: 'Welcome' },
-                notLoggedInMsg: { pl: 'Musisz sie zalogować...', en: 'Please log in first...' },
                 basicAuthForm: {
                     username: { pl: 'Nazwa użytkownika', en: 'Username' },
                     password: { pl: 'Hasło', en: 'Password' },
                     loginButton: { pl: 'Zaloguj mnie (Hej, spoofersi)', en: 'Login (Hi, spoofers)' }
+                },
+                panelSearch: {
+                    label: { pl: 'Użytkownik', en: 'Username' },
+                    placeholder: { pl: 'Wprowadź wartość', en: 'Provide a value' },
+                    button: { pl: 'Szukaj', en: 'Search'}
+                },
+                panelTable: {
+                    title: { pl: 'repozytoria', en: 'repositories' },
+                    headers: {
+                        name: { pl: 'Nazwa', en: 'Name'},
+                        created: { pl: 'Utworzone', en: 'Created' },
+                        updated: { pl: 'Uaktualnione', en: 'Updated' },
+                        language: { pl: 'Język', en: 'Language' },
+                        stars: { pl: 'Gwiazdki', en: 'Stars' },
+                        forks: { pl: 'Widelce...', en: 'Forks'}
+                    }
                 },
                 unstarDialog: {
                     confirmTitle: { pl: 'Proszę potwierdź', en: 'Please confirm' },
@@ -26,7 +41,7 @@
     })
     .service('appStateSrvc', function () {
         return {
-            loggedIn: false
+            githubUsername: '',
         }
     })
     .service('helpersSrvc', function ($http, $q) {
@@ -34,7 +49,7 @@
             login: function (userName, password) {
                 var q = $q.defer();
 
-                $http({ method: 'GET', url: 'Github/Login?username=' + userName + '&password=' + password })
+                $http({ method: 'GET', url: 'Home/Login?username=' + userName + '&password=' + password })
                 .then(function (result) {
                     q.resolve(result);
                 }, function (result) {
@@ -46,7 +61,7 @@
             getUserData: function (userName) {
                 var q = $q.defer();
 
-                $http({ method: 'GET', url: 'Github/GetUserData?username=' + userName })
+                $http({ method: 'GET', url: 'Home/GetUserData?username=' + userName })
                 .then(function (result) {
                     q.resolve(result);
                 }, function (result) {
@@ -60,7 +75,7 @@
 
                 $http({
                     method: 'GET',
-                    url: 'Github/StarRepo?username=' + username + '&name=' + repo,
+                    url: 'Home/StarRepo?username=' + username + '&name=' + repo,
                 })
                 .then(function (result) {
                     q.resolve(result);
@@ -75,7 +90,7 @@
 
                 $http({
                     method: 'GET',
-                    url: 'Github/UnstarRepo?username=' + username + '&name=' + repo,
+                    url: 'Home/UnstarRepo?username=' + username + '&name=' + repo,
                 })
                 .then(function (result) {
                     q.resolve(result);
@@ -87,14 +102,19 @@
             }
         }
     })
-    .controller('indexCtrl', function ($scope, $rootScope, $timeout, $location, appStateSrvc, languageSrvc, helpersSrvc) {
-        // Initial
-        $scope.userData = null;
-        $scope.tooltip = {
-            visible: false,
-            message: ''
-        };
-        $scope.showLoginForm = false;
+    .controller('indexCtrl', function ($scope, $rootScope, $timeout, $location, $element, appStateSrvc, languageSrvc, helpersSrvc) {
+        // Naive check to see if user is logged in
+        (function () {
+            var username = angular.element(document).find('my-data').attr('username');
+
+            if (username == undefined) {
+                // Keep default values on appStateSrvc
+            } else {
+                appStateSrvc.githubUsername = username;
+            }
+
+            $scope.appState = appStateSrvc;
+        }())
 
         // Language related
         $scope.language = {
@@ -108,17 +128,15 @@
             $rootScope.$broadcast('languageChange', { current: languageSrvc.current })
         };
 
-        $scope.appState = appStateSrvc;
-
         $scope.logIn = function (userName, password) {
             helpersSrvc.login(userName, password)
               .then(function (result) {
                   if (result.data.status == 'Ok') {
                       $scope.userData = result.data.data;
-                      appStateSrvc.loggedIn = true;
+
+                      appStateSrvc.githubUsername = userName;
                   } else if (result.data.status == 'Error') {
-                      $scope.userData = null;
-                      appStateSrvc.loggedIn = false;
+                      appStateSrvc.githubUsername = '';
 
                       // Lazy message for now
                       alert('Bad credentials')
@@ -126,42 +144,15 @@
                       alert('Unknown server response')
                   }
               }, function (result) {
-                  console.log(result);
+
               })
         };
 
         $scope.logOut = function () {
-            appStateSrvc.loggedIn = false;
-            $scope.userData = {};
-        };
-
-        // We do not want that timout to proceed after mouseleave
-        // TODO-BUG: It's not getting canceled properly in some scenarios
-        var tooltipTimeout = function (fn) {
-            $timeout(fn, 1000)
-        };
-
-        $scope.showTooltip = function (target) {
-            function showTooltip() {
-                $scope.tooltip.visible = true;
-
-                if (target == 'BA') {
-                    $scope.tooltip.message = 'Basic authentication - it will not persist state';
-                } else if (target == 'OA') {
-                    $scope.tooltip.message = 'OAUTH authentication - persists state after reload';
-                }
-            }
-
-            tooltipTimeout(showTooltip)
-        };
-
-        $scope.hideTooltip = function () {
-            $timeout.cancel(tooltipTimeout)
-            $scope.tooltip.visible = false;
+            appStateSrvc.githubUsername = '';
         };
 
         // Watches
-        // It should be in a function responsible for changing language. Here just to use $watch in some scenarios
         $scope.$watch('language.current', function (nv) {
             languageSrvc.current = nv;
         })
@@ -184,7 +175,6 @@
 
                 scope.goMental = function () {
                     scope.login({ userName: scope.user.name, password: scope.user.password })
-                    scope.showLoginForm = false;
                 };
 
                 scope.$on('languageChange', function (event, args) {
@@ -193,7 +183,6 @@
             },
             scope: {
                 login: '&',
-                showLoginForm: '='
             }
         }
     })
@@ -206,6 +195,16 @@
                 scope.getUserFormData = {
                     name: 'chrishermut'
                 };
+
+                // Language related
+                scope.language = {
+                    current: languageSrvc.current,
+                    content: languageSrvc.content
+                };
+
+                scope.$on('languageChange', function (event, args) {
+                    scope.language.current = args.current;
+                })
 
                 scope.selected = [];
 
@@ -230,7 +229,7 @@
                         })
                 };
 
-                scope.starRepo = function () {
+                function starRepo() {
                     helpersSrvc.starRepo(scope.data.userData.login, scope.selected[0].name)
                         .then(function (result) {
                             if (result.data == 'Ok') {
@@ -251,7 +250,7 @@
                         }, function (result) {
                             console.log(result)
                         })
-                };
+                }
 
                 function unstarRepo() {
                     helpersSrvc.unstarRepo(scope.data.userData.login, scope.selected[0].name)
@@ -260,7 +259,7 @@
                         }, function (result) {
 
                         })
-                };
+                }
 
                 // Dialogs
                 scope.unstarRepoDialog = function () {

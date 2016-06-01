@@ -1,12 +1,15 @@
 ﻿<ng-form novalidate name="getUserForm" layout="column" layout-padding>
     <md-input-container style="margin: 0 0 0 0 ">
-        <label>Username</label>
-        <input type="text" ng-model="getUserFormData.name" name="name" required="">
+        <label>{{language.content.panelSearch.label[language.current]}}</label>
+        <input type="text" ng-model="getUserFormData.name" name="name" required="" placeholder="{{language.content.panelSearch.placeholder[language.current]}}">
+        <div ng-messages="getUserFormData.name.$error">
+            <div ng-message="required">Field is required</div>
+        </div>
     </md-input-container>
     <div layout>
         <span flex></span>
-        <md-button ng-click="getUserData()" class="md-button md-raised" aria-label="...">
-            Get user data
+        <md-button ng-click="getUserData()" ng-disabled="getUserForm.$invalid" class="md-button md-raised" aria-label="...">
+            {{language.content.panelSearch.button[language.current]}}
         </md-button>
     </div>
 </ng-form>
@@ -14,7 +17,7 @@
 <div ng-hide="data == null || data.repositories.length == 0">
     <md-data-table-toolbar style="border-bottom: solid whitesmoke 1px; background-color: skyblue">
         <div class="md-toolbar-tools">
-            <span>{{data.userData.username}}'s repositories</span>
+            <span>{{data.userData.username}} - {{language.content.panelTable.title[language.current]}}</span>
         </div>
         <span flex></span>
         <md-button ng-click="starRepo()" ng-disabled="selected.length == 0" class="md-icon-button">
@@ -28,12 +31,12 @@
         <table md-data-table md-row-select="selected">
             <thead>
                 <tr>
-                    <th name="Name"></th>
-                    <th name="Created"></th>
-                    <th name="Updated"></th>
-                    <th name="Language"></th>
-                    <th name="Stars"></th>
-                    <th name="Forks"></th>
+                    <th name="{{language.content.panelTable.headers.name[language.current]}}"></th>
+                    <th name="{{language.content.panelTable.headers.created[language.current]}}"></th>
+                    <th name="{{language.content.panelTable.headers.updated[language.current]}}"></th>
+                    <th name="{{language.content.panelTable.headers.language[language.current]}}"></th>
+                    <th name="{{language.content.panelTable.headers.stars[language.current]}}"></th>
+                    <th name="{{language.content.panelTable.headers.forks[language.current]}}"></th>
                 </tr>
             </thead>
             <tbody>

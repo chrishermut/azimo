@@ -3,16 +3,14 @@
 }
 
 <div ng-controller="indexCtrl" layout="column" layout-fill>
-    <md-toolbar ng-mouseleave="hideTooltip()">
+    <my-data username="@ViewBag.Username"></my-data>
+
+    <md-toolbar>
         <div class="md-toolbar-tools">
             <span>{{language.content.title[language.current]}}</span>
             <span flex></span>
-            <div ng-hide="appState.loggedIn">
-                <md-button ng-click="showLoginForm = true" ng-mouseenter="showTooltip('BA')" class="md-fab md-mini">BA</md-button>
-                <md-button a-href="Home/AuthIndex" ng-mouseenter="showTooltip('OA')" class="md-fab md-mini">OA</md-button>
-            </div>
-            <div ng-show="appState.loggedIn">
-                <span>{{language.content.salutation[language.current]}}, {{userData.login}}</span>
+            <div ng-show="appState.githubUsername != ''">
+                <span>{{language.content.salutation[language.current]}}, {{appState.githubUsername}}</span>
                 <md-button ng-click="logOut()" class="md-fab md-mini">LO</md-button>
             </div>
             <span>|</span>
@@ -21,17 +19,11 @@
             </div>
         </div>
     </md-toolbar>
-    @*<md-subheader ng-show="tooltip.visible" style="border-bottom: 1px solid grey">
-        {{tooltip.message}}
-    </md-subheader>*@
     <md-content layout layout-align="center center" style="min-height: 80vh">
-        <h1 ng-hide="showLoginForm || appState.loggedIn">
-            {{language.content.notLoggedInMsg[language.current]}}
-        </h1>
-        <div ng-show="showLoginForm" md-whiteframe="3dp" layout-padding flex="50">
-            <basic-auth-drv login="logIn(userName, password)" show-login-form="showLoginForm"></basic-auth-drv>
+        <div ng-show="appState.githubUsername == ''" md-whiteframe="3dp" layout-padding flex="50">
+            <basic-auth-drv login="logIn(userName, password)"></basic-auth-drv>
         </div>
-        <div ng-show="appState.loggedIn" md-whiteframe="3dp" layout-padding flex="90">
+        <div ng-show="appState.githubUsername != ''" md-whiteframe="3dp" layout-padding flex="90" style="min-height: 60vh">
             <panel-drv></panel-drv>
         </div>
     </md-content>
